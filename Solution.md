@@ -137,3 +137,56 @@ content-length: 7985
 ./semester | grep last-modified > ~/last-modified.txt
 ```
 
+## Shell Tools and Scripting
+
+### 1
+
+```shell
+ls -ahltG
+```
+
+### 2
+
+```shell
+#!/bin/zsh
+
+macro() {
+	MACRO=$(pwd)
+}
+
+polo() {
+	cd "$MACRO"
+}
+```
+
+### 3
+
+```shell
+count=1
+
+while true
+do
+    ./script.sh 2> out.log
+    if [[ $? -ne 0 ]]; then
+        echo "failed after $count times"
+        cat out.log
+        break
+    fi
+    ((count++))
+
+done
+
+```
+
+#### 4
+
+```shell
+find . -name '*.html' -print0 | xargs -0 tar -vcf html.zip
+```
+
+### 5
+
+```shell
+find . -type f -print0 | xargs -0 ls -lt | head -1
+```
+

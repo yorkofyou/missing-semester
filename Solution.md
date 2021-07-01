@@ -190,3 +190,37 @@ find . -name '*.html' -print0 | xargs -0 tar -vcf html.zip
 find . -type f -print0 | xargs -0 ls -lt | head -1
 ```
 
+## Editors (Vim)
+
+### 1
+
+```shell
+vimtutor
+```
+
+### 6
+
+[Vimium](https://chrome.google.com/webstore/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb?hl=en)
+
+[vscodevim](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim)
+
+[IdeaVim](https://plugins.jetbrains.com/plugin/164-ideavim)
+
+[jupyterlab-vim](https://pypi.org/project/jupyterlab-vim/)
+
+zsh
+
+```shell
+# Enable vi mode
+bindkey -v
+```
+
+### 8
+
+1. dd
+2. Gdd
+3. gg^
+4. qwc${<ESC>wv5lc"name": "<ESC>/<<Enter>v6lc,<ESC>wv6lc"email": "<ESC>/<<Enter>v7lc"wc$},<ESC>wq
+5. 999@q
+6. ggO{
+7. Go}

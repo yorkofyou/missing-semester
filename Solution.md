@@ -224,3 +224,38 @@ bindkey -v
 5. 999@q
 6. ggO{
 7. Go}
+
+## Data Wrangling
+
+### 2
+
+```shell
+grep -E '(a.*){3}[^s]$' /usr/share/dict/words | wc -l
+grep -E '(a.*){3}[^s]$' /usr/share/dict/words | sed -E 's/(.*(..))/\2/' | sort | uniq -c | sort -nk1,1 | tail -n3
+grep -E '(a.*){3}[^s]$' /usr/share/dict/words | sed -E 's/(.*(..))/\2/' | sort | uniq -c | awk '{print $2}' > occurrence.txt | printf '%s\n' {a..z}{a..z} > all.txt | diff --unchanged-group-format='' <(cat occurrence.txt) <(cat all.txt) | wc -l
+```
+
+### 3
+
+```shell
+sed -i s/REGEX/SUBSTITUTION/ input.txt > input.txt
+```
+
+### 4
+
+```shell
+journalctl | grep "Startup finished" | sed -E "s/^.*Startup finished in ([0-9]+\.?[0-9]*)m?s.*$/\1/" | tail -n10 | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
+```
+
+### 5
+
+```shell
+for i in 1 2 3; do journalctl -b-$i | grep "Startup finished" ;done | sed -E "s/.*in\ (.*)/\1/" | sort | uniq -c | sort | awk '$1<3 { print }'
+```
+
+### 6
+
+```shell
+curl -s https://stats.wikimedia.org/EN/TablesWikipediaZZ.htm | pup 'table#table1 json{}' | jq '.[0].children[0].children[12:-3][] | .children[1].text' | sed -E 's/\"([0-9]+)\"/\1/g' | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
+curl -s https://stats.wikimedia.org/EN/TablesWikipediaZZ.htm | pup 'table#table1 json{}' | jq '.[0].children[0].children[12:-3][] | .children[2].text' | sed -E 's/\"([0-9]+)\"/\1/g' | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
+```

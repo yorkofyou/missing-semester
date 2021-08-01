@@ -259,3 +259,47 @@ for i in 1 2 3; do journalctl -b-$i | grep "Startup finished" ;done | sed -E "s/
 curl -s https://stats.wikimedia.org/EN/TablesWikipediaZZ.htm | pup 'table#table1 json{}' | jq '.[0].children[0].children[12:-3][] | .children[1].text' | sed -E 's/\"([0-9]+)\"/\1/g' | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
 curl -s https://stats.wikimedia.org/EN/TablesWikipediaZZ.htm | pup 'table#table1 json{}' | jq '.[0].children[0].children[12:-3][] | .children[2].text' | sed -E 's/\"([0-9]+)\"/\1/g' | R --slave -e 'x <- scan(file="stdin", quiet=TRUE); summary(x)'
 ```
+
+## Command-line Environment
+
+**Job Control**
+
+### 1
+
+```shell
+sleep 10000
+<Ctrl-Z>
+bg
+pgrep -af sleep
+pkill -af sleep
+```
+
+### 2
+
+```shell
+sleep 60 &
+wait %1
+ls
+```
+
+**Alias**
+
+### 1
+
+```shell
+alias dc="cd"
+```
+
+**Remote Machines**
+
+### 2
+
+```shell
+ssh -L 9999:localhost:8888 my_server
+```
+
+### 5
+
+```shell
+ssh -fN -L 9999:localhost:8888 my_server
+```

@@ -9,8 +9,6 @@ cd /tmp
 mkdir missing
 ```
 
-
-
 ### 3
 
 touch
@@ -302,4 +300,37 @@ ssh -L 9999:localhost:8888 my_server
 
 ```shell
 ssh -fN -L 9999:localhost:8888 my_server
+```
+
+## Version Control (Git)
+
+### 2
+
+#### 1
+
+```shell
+git log --all --graph --decorate
+```
+
+#### 2
+
+```shell
+git log -n 1
+```
+
+#### 3
+
+```shell
+git blame _config.yml | grep collections | sed -E 's/(\w*) .*/\1/g' | xargs git show -s
+```
+
+### 4
+
+Stashes are encoded as commit objects, which can be inspected with ```git log```. The ```git stash``` command takes uncommited changes (both staged and unstaged), saves them away for later use, and then reverts them from working copy.
+
+### 5
+
+```shell
+[alias]
+    graph = log --all --graph --decorate --oneline
 ```

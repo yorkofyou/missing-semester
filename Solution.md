@@ -334,3 +334,212 @@ Stashes are encoded as commit objects, which can be inspected with ```git log```
 [alias]
     graph = log --all --graph --decorate --oneline
 ```
+
+## Debugging and Profiling
+
+**Debugging**
+
+### 3
+
+```shell
+$ shellcheck 3.sh
+In 3.sh line 3:
+for f in $(ls *.m3u)
+         ^---------^ SC2045: Iterating over ls output is fragile. Use globs.
+              ^-- SC2035: Use ./*glob* or -- *glob* so names with dashes won't become options.
+
+
+In 3.sh line 5:
+  grep -qi hq.*mp3 $f \
+           ^-----^ SC2062: Quote the grep pattern so the shell won't interpret it.
+                   ^-- SC2086: Double quote to prevent globbing and word splitting.
+
+Did you mean:
+  grep -qi hq.*mp3 "$f" \
+
+
+In 3.sh line 6:
+    && echo -e 'Playlist $f contains a HQ file in mp3 format'
+            ^-- SC3037: In POSIX sh, echo flags are undefined.
+               ^-- SC2016: Expressions don't expand in single quotes, use double quotes for that.
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2045 -- Iterating over ls output is fragi...
+  https://www.shellcheck.net/wiki/SC2062 -- Quote the grep pattern so the she...
+  https://www.shellcheck.net/wiki/SC3037 -- In POSIX sh, echo flags are undef...
+```
+
+```shell
+#!/bin/sh
+## Example: a typical script with several problems
+for f in ./*.m3u
+do
+  grep -qi "hq.*mp3" "$f" \
+    && echo "Playlist $f contains a HQ file in mp3 format"
+done
+```
+
+**Profiling**
+
+### 1
+
+```shell
+python -m cProfile sorts.py | grep sorts.py
+```
+
+```shell
+        1    0.000    0.000    0.125    0.125 sorts.py:1(<module>)
+     1000    0.017    0.000    0.017    0.000 sorts.py:11(insertionsort)
+33912/1000    0.016    0.000    0.024    0.000 sorts.py:23(quicksort)
+    16456    0.004    0.000    0.004    0.000 sorts.py:27(<listcomp>)
+    16456    0.004    0.000    0.004    0.000 sorts.py:28(<listcomp>)
+33886/1000    0.017    0.000    0.018    0.000 sorts.py:32(quicksort_inplace)
+        3    0.002    0.001    0.121    0.040 sorts.py:4(test_sorted)
+     3000    0.008    0.000    0.057    0.000 sorts.py:6(<listcomp>)
+```
+
+Decorate `quicksort`, `quicksort_inplace`, `insertionsort` with `@profile`, then run:
+
+```shell
+kernprof -l -v sorts.py
+```
+
+```shell
+Total time: 0.058093 s
+File: sorts.py
+Function: quicksort at line 24
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    24                                           @profile
+    25                                           def quicksort(array):
+    26     34020       9417.0      0.3     16.2      if len(array) <= 1:
+    27     17510       4084.0      0.2      7.0          return array
+    28     16510       4236.0      0.3      7.3      pivot = array[0]
+    29     16510      15763.0      1.0     27.1      left = [i for i in array[1:] if i < pivot]
+    30     16510      15607.0      0.9     26.9      right = [i for i in array[1:] if i >= pivot]
+    31     16510       8986.0      0.5     15.5      return quicksort(left) + [pivot] + quicksort(right)
+```
+
+```shell
+Total time: 0.13372 s
+File: sorts.py
+Function: insertionsort at line 11
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    11                                           @profile
+    12                                           def insertionsort(array):
+    13                                           
+    14     25797       3998.0      0.2      3.0      for i in range(len(array)):
+    15     24797       4050.0      0.2      3.0          j = i-1
+    16     24797       4252.0      0.2      3.2          v = array[i]
+    17    226646      43663.0      0.2     32.7          while j >= 0 and v < array[j]:
+    18    201849      39002.0      0.2     29.2              array[j+1] = array[j]
+    19    201849      33832.0      0.2     25.3              j -= 1
+    20     24797       4772.0      0.2      3.6          array[j+1] = v
+    21      1000        151.0      0.2      0.1      return array
+```
+
+```shell
+Total time: 0.120478 s
+File: sorts.py
+Function: quicksort_inplace at line 34
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    34                                           @profile
+    35                                           def quicksort_inplace(array, low=0, high=None):
+    36     34050       7115.0      0.2      5.9      if len(array) <= 1:
+    37        38          3.0      0.1      0.0          return array
+    38     34012       6265.0      0.2      5.2      if high is None:
+    39       962        214.0      0.2      0.2          high = len(array)-1
+    40     34012       6211.0      0.2      5.2      if low >= high:
+    41     17487       2740.0      0.2      2.3          return array
+    42                                           
+    43     16525       3123.0      0.2      2.6      pivot = array[high]
+    44     16525       3112.0      0.2      2.6      j = low-1
+    45    126331      23693.0      0.2     19.7      for i in range(low, high):
+    46    109806      20277.0      0.2     16.8          if array[i] <= pivot:
+    47     57399      10540.0      0.2      8.7              j += 1
+    48     57399      13824.0      0.2     11.5              array[i], array[j] = array[j], array[i]
+    49     16525       4503.0      0.3      3.7      array[high], array[j+1] = array[j+1], array[high]
+    50     16525       8123.0      0.5      6.7      quicksort_inplace(array, low, j)
+    51     16525       7849.0      0.5      6.5      quicksort_inplace(array, j+2, high)
+    52     16525       2886.0      0.2      2.4      return array
+```
+
+```shell
+python -m memory_profiler sorts.py
+```
+
+```shell
+Filename: sorts.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    24   42.828 MiB   42.828 MiB       34018   @profile
+    25                                         def quicksort(array):
+    26   42.828 MiB    0.000 MiB       34018       if len(array) <= 1:
+    27   42.828 MiB    0.000 MiB       17509           return array
+    28   42.828 MiB    0.000 MiB       16509       pivot = array[0]
+    29   42.828 MiB    0.000 MiB      158788       left = [i for i in array[1:] if i < pivot]
+    30   42.828 MiB    0.000 MiB      158788       right = [i for i in array[1:] if i >= pivot]
+    31   42.828 MiB    0.000 MiB       16509       return quicksort(left) + [pivot] + quicksort(right)
+```
+
+```shell
+Filename: sorts.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    34   42.844 MiB   42.828 MiB       32818   @profile
+    35                                         def quicksort_inplace(array, low=0, high=None):
+    36   42.844 MiB    0.000 MiB       32818       if len(array) <= 1:
+    37   42.844 MiB    0.000 MiB          48           return array
+    38   42.844 MiB    0.000 MiB       32770       if high is None:
+    39   42.844 MiB    0.000 MiB         952           high = len(array)-1
+    40   42.844 MiB    0.000 MiB       32770       if low >= high:
+    41   42.844 MiB    0.000 MiB       16861           return array
+    42                                         
+    43   42.844 MiB    0.000 MiB       15909       pivot = array[high]
+    44   42.844 MiB    0.000 MiB       15909       j = low-1
+    45   42.844 MiB    0.016 MiB      120321       for i in range(low, high):
+    46   42.844 MiB    0.000 MiB      104412           if array[i] <= pivot:
+    47   42.844 MiB    0.000 MiB       53912               j += 1
+    48   42.844 MiB    0.000 MiB       53912               array[i], array[j] = array[j], array[i]
+    49   42.844 MiB    0.000 MiB       15909       array[high], array[j+1] = array[j+1], array[high]
+    50   42.844 MiB    0.000 MiB       15909       quicksort_inplace(array, low, j)
+    51   42.844 MiB    0.000 MiB       15909       quicksort_inplace(array, j+2, high)
+    52   42.844 MiB    0.000 MiB       15909       return array
+```
+
+```shell
+Filename: sorts.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    11   42.969 MiB   42.844 MiB        1000   @profile
+    12                                         def insertionsort(array):
+    13                                         
+    14   42.969 MiB    0.000 MiB       26183       for i in range(len(array)):
+    15   42.969 MiB    0.000 MiB       25183           j = i-1
+    16   42.969 MiB    0.000 MiB       25183           v = array[i]
+    17   42.969 MiB    0.031 MiB      231723           while j >= 0 and v < array[j]:
+    18   42.969 MiB    0.062 MiB      206540               array[j+1] = array[j]
+    19   42.969 MiB    0.031 MiB      206540               j -= 1
+    20   42.969 MiB    0.000 MiB       25183           array[j+1] = v
+    21   42.969 MiB    0.000 MiB        1000       return array
+```
+
+### 6
+
+![unmemoized](7/pycallgraph-unmemoized.png)
+
+![memoized](7/pycallgraph-memoized.png)
+
+### 8
+
+![stress](7/stress.png)
+
+![taskset-stress](7/taskset-stress.png)

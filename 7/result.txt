@@ -1,0 +1,56 @@
+Filename: sorts.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    11   42.969 MiB   42.844 MiB        1000   @profile
+    12                                         def insertionsort(array):
+    13                                         
+    14   42.969 MiB    0.000 MiB       26183       for i in range(len(array)):
+    15   42.969 MiB    0.000 MiB       25183           j = i-1
+    16   42.969 MiB    0.000 MiB       25183           v = array[i]
+    17   42.969 MiB    0.031 MiB      231723           while j >= 0 and v < array[j]:
+    18   42.969 MiB    0.062 MiB      206540               array[j+1] = array[j]
+    19   42.969 MiB    0.031 MiB      206540               j -= 1
+    20   42.969 MiB    0.000 MiB       25183           array[j+1] = v
+    21   42.969 MiB    0.000 MiB        1000       return array
+
+
+Filename: sorts.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    24   42.828 MiB   42.828 MiB       34018   @profile
+    25                                         def quicksort(array):
+    26   42.828 MiB    0.000 MiB       34018       if len(array) <= 1:
+    27   42.828 MiB    0.000 MiB       17509           return array
+    28   42.828 MiB    0.000 MiB       16509       pivot = array[0]
+    29   42.828 MiB    0.000 MiB      158788       left = [i for i in array[1:] if i < pivot]
+    30   42.828 MiB    0.000 MiB      158788       right = [i for i in array[1:] if i >= pivot]
+    31   42.828 MiB    0.000 MiB       16509       return quicksort(left) + [pivot] + quicksort(right)
+
+
+Filename: sorts.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    34   42.844 MiB   42.828 MiB       32818   @profile
+    35                                         def quicksort_inplace(array, low=0, high=None):
+    36   42.844 MiB    0.000 MiB       32818       if len(array) <= 1:
+    37   42.844 MiB    0.000 MiB          48           return array
+    38   42.844 MiB    0.000 MiB       32770       if high is None:
+    39   42.844 MiB    0.000 MiB         952           high = len(array)-1
+    40   42.844 MiB    0.000 MiB       32770       if low >= high:
+    41   42.844 MiB    0.000 MiB       16861           return array
+    42                                         
+    43   42.844 MiB    0.000 MiB       15909       pivot = array[high]
+    44   42.844 MiB    0.000 MiB       15909       j = low-1
+    45   42.844 MiB    0.016 MiB      120321       for i in range(low, high):
+    46   42.844 MiB    0.000 MiB      104412           if array[i] <= pivot:
+    47   42.844 MiB    0.000 MiB       53912               j += 1
+    48   42.844 MiB    0.000 MiB       53912               array[i], array[j] = array[j], array[i]
+    49   42.844 MiB    0.000 MiB       15909       array[high], array[j+1] = array[j+1], array[high]
+    50   42.844 MiB    0.000 MiB       15909       quicksort_inplace(array, low, j)
+    51   42.844 MiB    0.000 MiB       15909       quicksort_inplace(array, j+2, high)
+    52   42.844 MiB    0.000 MiB       15909       return array
+
+

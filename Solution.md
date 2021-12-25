@@ -543,3 +543,22 @@ Line #    Mem usage    Increment  Occurences   Line Contents
 ![stress](7/stress.png)
 
 ![taskset-stress](7/taskset-stress.png)
+
+## Metaprogramming
+
+### 1
+
+```makefile
+paper.pdf: paper.tex plot-data.png
+	pdflatex paper.tex
+
+plot-%.png: %.dat plot.py
+	./plot.py -i $*.dat -o $@
+
+.PHONY: clean
+clean:
+	git ls-files --others | xargs rm -f
+```
+
+### 3
+

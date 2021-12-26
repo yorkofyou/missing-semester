@@ -1,9 +1,9 @@
+#!/usr/bin/env bash
 count=1
 
 while true
 do
-    ./script.sh 2> out.log
-    if [[ $? -ne 0 ]]; then
+    if ! ./script.sh 2> out.log ; then
         echo "failed after $count times"
         cat out.log
         break

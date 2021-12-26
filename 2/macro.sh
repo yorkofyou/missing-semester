@@ -1,9 +1,9 @@
-#!/bin/zsh
+#!/bin/sh
 
 macro() {
 	MACRO=$(pwd)
 }
 
 polo() {
-	cd "$MACRO"
+	cd "$MACRO" || exit
 }

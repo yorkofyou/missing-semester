@@ -1,6 +1,8 @@
 # MIT The Missing Semester of Your CS Education
 
-My solution for The Missing Semester of Your CS Education 2020.
+[![Build Status](https://github.com/yorkofyou/missing-semester/actions/workflows/main.yml/badge.svg)](https://github.com/yorkofyou/missing-semester/actions?query=workflow%3ACI)
+
+My solution for [The Missing Semester of Your CS Education](https://missing.csail.mit.edu/) 2020.
 
 ## Course overview + the shell
 
